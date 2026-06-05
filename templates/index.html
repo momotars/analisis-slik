@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Analisis SLIK OJK</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "DM Sans", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(83, 35, 151, .10), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(255, 153, 0, .13), transparent 35%),
+    #eef2f7;
+  color: #111827;
+}
+
+.topbar {
+  background: linear-gradient(135deg, #111827, #1f2a44);
+  border-bottom: 4px solid #f59e0b;
+  padding: 18px 40px;
+  box-shadow: 0 8px 24px rgba(15,23,42,.25);
+}
+
+.logo {
+  height: 58px;
+  max-width: 520px;
+  object-fit: contain;
+}
+
+.page-wrap {
+  min-height: calc(100vh - 96px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.upload-card {
+  width: 100%;
+  max-width: 860px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 42px;
+  box-shadow: 0 22px 55px rgba(15,23,42,.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-card::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(82, 36, 152, .16), transparent 65%);
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4c1d95, #7c3aed);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 18px;
+  box-shadow: 0 12px 30px rgba(76,29,149,.28);
+}
+
+.title {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.title span {
+  color: #4c1d95;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  margin-bottom: 32px;
+}
+
+.gold-line {
+  width: 80px;
+  height: 4px;
+  background: #f59e0b;
+  border-radius: 999px;
+  margin: 0 auto 22px;
+}
+
+.form-label {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-analisis {
+  background: linear-gradient(135deg, #4c1d95, #6d28d9);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(76,29,149,.25);
+}
+
+.btn-analisis:hover {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.note {
+  margin-top: 28px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 18px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.note span {
+  color: #4c1d95;
+  font-weight: 700;
+}
+
+.footer-text {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar text-center">
+  <img src="{{ url_for('static', filename='images/logo-bpr.png') }}" class="logo" alt="Bank Dana Berkah">
+</div>
+
+<div class="page-wrap">
+  <div>
+    <div class="upload-card">
+
+      <div class="icon-circle">📊</div>
+
+      <h1 class="title"> Analisis <span>SLIK OJK</span></h1>
+      <div class="gold-line"></div>
+
+      <p class="subtitle">
+        Upload file PDF/Excel SLIK untuk analisis awal risiko debitur.
+      </p>
+
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-4">
+          <label class="form-label">File SLIK</label>
+          <input class="form-control" type="file" name="file" accept=".pdf,.xlsx,.xls" required>
+        </div>
+
+        <button type="submit" class="btn btn-analisis">
+          🔍 Analisis
+        </button>
+      </form>
+
+      <div class="note">
+        <span>Catatan:</span> hasil sistem adalah alat bantu analisis awal dan tetap wajib diverifikasi oleh analis kredit.
+      </div>
+
+    </div>
+
+    <div class="footer-text">
+      PT. BPR Dana Berkah Pusakatama · Internal Credit Analysis Tool
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      color: #222;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    h2 {
+      font-size: 15px;
+      margin-top: 24px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    td, th {
+      border: 1px solid #999;
+      padding: 6px;
+      vertical-align: top;
+    }
+    .risk {
+      font-weight: bold;
+    }
+    .ai {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .note {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Laporan Analisis SLIK</h1>
+  <div>File: {{ filename }}</div>
+
+  <h2>Data Debitur</h2>
+  <table>
+    <tr><th>Nama</th><td>{{ extracted.nama or '-' }}</td></tr>
+    <tr><th>NIK</th><td>{{ extracted.nik or '-' }}</td></tr>
+    <tr><th>Nomor Laporan</th><td>{{ extracted.nomor_laporan or '-' }}</td></tr>
+    <tr><th>Posisi Data</th><td>{{ extracted.posisi_data or '-' }}</td></tr>
+    <tr><th>Tanggal Permintaan</th><td>{{ extracted.tanggal_permintaan or '-' }}</td></tr>
+  </table>
+
+  <h2>Ringkasan Fasilitas</h2>
+  <table>
+    <tr><th>Kolektibilitas</th><td>{{ extracted.kolektibilitas_terburuk }} / {{ extracted.bulan_kolektibilitas_terburuk }}</td></tr>
+    <tr><th>Total Plafon</th><td>Rp {{ "{:,}".format(extracted.total_plafon).replace(",", ".") }}</td></tr>
+    <tr><th>Baki Debet</th><td>Rp {{ "{:,}".format(extracted.total_baki_debet).replace(",", ".") }}</td></tr>
+    <tr><th>Total Tunggakan</th><td>Rp {{ "{:,}".format(extracted.total_tunggakan).replace(",", ".") }}</td></tr>
+    <tr><th>Jumlah Kreditur</th><td>{{ extracted.jumlah_kreditur }}</td></tr>
+  </table>
+
+  <h2>Komposisi Kreditur</h2>
+  <table>
+    <tr>
+      <th>Bank Umum</th>
+      <th>BPR/BPRS</th>
+      <th>Lembaga Pembiayaan</th>
+      <th>Lainnya</th>
+    </tr>
+    <tr>
+      <td>{{ extracted.bank_umum }}</td>
+      <td>{{ extracted.bpr_bprs }}</td>
+      <td>{{ extracted.lembaga_pembiayaan }}</td>
+      <td>{{ extracted.lainnya }}</td>
+    </tr>
+  </table>
+
+  <h2>Analisis Sistem</h2>
+  <p>Risiko: <span class="risk">{{ result.risk }}</span></p>
+  <ul>
+    {% for item in result.findings %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+  <p><strong>Rekomendasi:</strong> {{ result.recommendation }}</p>
+
+  <h2>Analisis AI</h2>
+  {% if ai_text %}
+    <div class="ai">{{ ai_text }}</div>
+  {% else %}
+    <p>AI tidak tersedia. Laporan menggunakan analisis otomatis berbasis rule internal.</p>
+  {% endif %}
+
+  <div class="note">
+    Catatan: Laporan ini merupakan alat bantu analisis awal. Keputusan kredit tetap wajib diverifikasi dan ditetapkan oleh analis/pejabat berwenang.
+  </div>
+
+</body>
+</html>

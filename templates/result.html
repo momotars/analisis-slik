@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Analisis SLIK</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --navy:#111827;
+  --navy2:#1f2a44;
+  --gold:#c8962e;
+  --bg:#eef2f7;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+}
+
+body {
+  background: var(--bg);
+  font-family: "DM Sans", sans-serif;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.topbar {
+  background: linear-gradient(135deg, var(--navy), var(--navy2));
+  color: white;
+  padding: 22px 32px;
+  border-bottom: 5px solid var(--gold);
+  box-shadow: 0 8px 24px rgba(15,23,42,.25);
+}
+
+.topbar h3 {
+  font-size: 30px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.topbar small {
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.container-main {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 26px;
+}
+
+.cardx {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgba(15,23,42,.08);
+  padding: 26px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 26px;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.kpi-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  border-top: 5px solid var(--gold);
+  box-shadow: 0 8px 20px rgba(15,23,42,.07);
+  min-height: 120px;
+}
+
+.kpi-title {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--navy);
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.chart-box {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.small-muted {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.btn-soft {
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* RISK BOX */
+.risk-box-high,
+.risk-box-medium,
+.risk-box-low {
+  border-radius: 20px;
+  padding: 24px;
+  color: white;
+  margin-bottom: 18px;
+  box-shadow: 0 12px 28px rgba(15,23,42,.16);
+}
+
+.risk-box-high {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.risk-box-medium {
+  background: linear-gradient(135deg, #d97706, #92400e);
+}
+
+.risk-box-low {
+  background: linear-gradient(135deg, #16a34a, #166534);
+}
+
+.risk-label {
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.risk-score {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: .95;
+}
+
+/* ANALYSIS */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+@media (max-width: 992px) {
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analysis-block {
+  margin-bottom: 22px;
+}
+
+.analysis-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(15,23,42,.08);
+}
+
+.analysis-title.warning {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+}
+
+.analysis-title.good {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.analysis-title.neutral {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.analysis-title.danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.analysis-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.finding {
+  border-radius: 14px;
+  padding: 14px 16px;
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.finding.danger {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  font-weight: 800;
+}
+
+.finding.warning {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  font-weight: 800;
+}
+
+.finding.good {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+  font-weight: 700;
+}
+
+.finding.info {
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.finding.neutral {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+/* SCORE */
+.score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.score-header-title {
+  font-size: 23px;
+  font-weight: 900;
+  color: var(--navy);
+}
+
+.score-mini {
+  background: #111827;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* FINAL DECISION */
+.final-decision {
+  margin-top: 28px;
+  border-radius: 26px;
+  padding: 34px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(15,23,42,.20);
+}
+
+.final-decision.high {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
+}
+
+.final-decision.medium {
+  background: linear-gradient(135deg, #d97706, #78350f);
+}
+
+.final-decision.low {
+  background: linear-gradient(135deg, #16a34a, #14532d);
+}
+
+.final-decision::after {
+  content: "";
+  position: absolute;
+  right: -50px;
+  top: -50px;
+  width: 210px;
+  height: 210px;
+  background: rgba(255,255,255,.10);
+  border-radius: 50%;
+}
+
+.final-label {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+.final-result {
+  font-size: 46px;
+  font-weight: 900;
+  margin-top: 12px;
+  line-height: 1.15;
+}
+
+.final-desc {
+  margin-top: 14px;
+  font-size: 15px;
+  opacity: .9;
+  max-width: 760px;
+}
+
+/* PINJOL */
+.alert-pinjol {
+  height: 100%;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 1px solid #fdba74;
+  border-left: 7px solid #f97316;
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.alert-pinjol-title {
+  font-weight: 900;
+  color: #9a3412;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.alert-pinjol-body {
+  color: #7c2d12;
+  line-height: 1.7;
+}
+
+.pinjol-list {
+  margin-top: 12px;
+  padding-left: 18px;
+}
+
+/* TABLE */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.slik-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 0;
+}
+
+.slik-table thead {
+  background: var(--navy);
+  color: white;
+}
+
+.slik-table th {
+  padding: 14px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.slik-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.slik-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.slik-table tfoot td {
+  background: var(--navy);
+  color: white;
+  font-weight: 800;
+}
+
+.score-badge {
+  display: inline-block;
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.badge-kol {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 30px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.kol-1 {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.kol-2 {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.kol-3,
+.kol-4,
+.kol-5 {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-lunas {
+  background: #dcfce7;
+  color: #166534;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.status-dialihkan {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.status-baru {
+  display: inline-block;
+  margin-top: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-pinjol {
+  display: inline-block;
+  margin-top: 6px;
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar d-flex justify-content-between align-items-center">
+  <div>
+    <h3>📊 Dashboard Analisis SLIK OJK</h3>
+    <small>Ringkasan profil debitur, fasilitas kredit, risiko, dan rekomendasi</small>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="/export-pdf" class="btn btn-light btn-soft">📄 Export PDF</a>
+    <a href="/" class="btn btn-outline-light btn-soft">Upload</a>
+    <a href="/history" class="btn btn-outline-light btn-soft">History</a>
+    <a href="/logout" class="btn btn-outline-danger btn-soft">Logout</a>
+  </div>
+</div>
+
+<div class="container-main">
+
+  <div class="cardx mb-4">
+    <div class="section-title">👤 Data Debitur</div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="label">Nama</div>
+        <div class="value">{{ extracted.nama or '-' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">NIK</div>
+        <div class="value">{{ extracted.nik or '-' }}</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="label">Posisi Data</div>
+        <div class="value">{{ extracted.posisi_data or '-' }}</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="label">Tanggal Permintaan</div>
+        <div class="value">{{ extracted.tanggal_permintaan or '-' }}</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="label">Nomor Laporan</div>
+        <div class="value">{{ extracted.nomor_laporan or '-' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="kpi-card">
+        <div class="kpi-title">Kol Terburuk Historis</div>
+        <div class="kpi-value">{{ extracted.kolektibilitas_terburuk or 0 }}</div>
+        <div class="kpi-sub">{{ extracted.bulan_kolektibilitas_terburuk or '-' }}</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="kpi-card">
+        <div class="kpi-title">Total Plafon</div>
+        <div class="kpi-value">Rp {{ extracted.total_plafon_fmt }}</div>
+        <div class="kpi-sub">Seluruh fasilitas terbaca</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="kpi-card">
+        <div class="kpi-title">Baki Debet</div>
+        <div class="kpi-value">Rp {{ extracted.total_baki_debet_fmt }}</div>
+        <div class="kpi-sub">Outstanding saat ini</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="kpi-card">
+        <div class="kpi-title">Jumlah Kreditur</div>
+        <div class="kpi-value">{{ extracted.jumlah_kreditur or 0 }}</div>
+        <div class="kpi-sub">
+          {{ extracted.bank_umum or 0 }} Bank Umum ·
+          {{ extracted.bpr_bprs or 0 }} BPR/BPRS ·
+          {{ extracted.lembaga_pembiayaan or 0 }} Finance
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-5">
+      <div class="cardx h-100">
+        <div class="section-title">📈 Status Fasilitas Saat Ini</div>
+
+        <div class="chart-box">
+          <canvas id="riskPie"></canvas>
+        </div>
+
+        <div class="small-muted text-center mt-2">
+          Berdasarkan kolektibilitas fasilitas yang terbaca pada detail SLIK.
+        </div>
+
+        <div class="finding warning mt-3">
+          ⚠️ Kol terburuk historis:
+          Kol {{ extracted.kolektibilitas_terburuk or 0 }}
+          {% if extracted.bulan_kolektibilitas_terburuk %}
+            / {{ extracted.bulan_kolektibilitas_terburuk }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      {% if extracted.jumlah_pinjol_baru_3_bulan and extracted.jumlah_pinjol_baru_3_bulan > 0 %}
+      <div class="alert-pinjol">
+        <div class="alert-pinjol-title">⚠️ Indikasi Fasilitas Digital/Pinjol Baru</div>
+
+        <div class="alert-pinjol-body">
+          Terdeteksi <strong>{{ extracted.jumlah_pinjol_baru_3_bulan }}</strong>
+          fasilitas digital/fintech/pinjol baru dalam 3 bulan terakhir.
+        </div>
+
+        {% if extracted.pinjol_baru_3_bulan %}
+        <ul class="pinjol-list">
+          {% for p in extracted.pinjol_baru_3_bulan[:8] %}
+          <li>
+            <strong>{{ p.kreditur }}</strong>
+            {% if p.tanggal_awal %}
+              — mulai {{ p.tanggal_awal }}
+            {% elif p.tanggal_mulai %}
+              — mulai {{ p.tanggal_mulai }}
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="alert-pinjol">
+        <div class="alert-pinjol-title">✅ Indikasi Fasilitas Digital/Pinjol Baru</div>
+        <div class="alert-pinjol-body">
+          Tidak terdeteksi fasilitas digital/fintech/pinjol baru dalam 3 bulan terakhir.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="cardx mb-4">
+    <div class="section-title">📑 Hasil Pre-Screening</div>
+
+    <div class="
+      {% if result.risk == 'TINGGI' %}
+        risk-box-high
+      {% elif result.risk == 'SEDANG' %}
+        risk-box-medium
+      {% else %}
+        risk-box-low
+      {% endif %}
+    ">
+      <div class="risk-label">Risiko: {{ result.risk }}</div>
+      <div class="risk-score">Score Analisis: {{ result.score }}/100</div>
+    </div>
+
+    {% if result.risk_summary %}
+    <div class="finding info mb-4">
+      🧾 {{ result.risk_summary }}
+    </div>
+    {% endif %}
+
+    <div class="analysis-grid">
+
+      {% if result.critical_risks %}
+      <div class="analysis-block">
+        <div class="analysis-title danger">🚨 Risiko Kritis</div>
+        <div class="analysis-list">
+          {% for item in result.critical_risks %}
+            <div class="finding danger">✗ {{ item }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.warnings %}
+      <div class="analysis-block">
+        <div class="analysis-title warning">⚠️ Perhatian</div>
+        <div class="analysis-list">
+          {% for item in result.warnings %}
+            <div class="finding warning">! {{ item }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.positives %}
+      <div class="analysis-block">
+        <div class="analysis-title good">✅ Positif</div>
+        <div class="analysis-list">
+          {% for item in result.positives %}
+            <div class="finding good">✓ {{ item }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.clarifications %}
+      <div class="analysis-block">
+        <div class="analysis-title neutral">❓ Rekomendasi / Klarifikasi</div>
+        <div class="analysis-list">
+          {% for item in result.clarifications %}
+            <div class="finding neutral">? {{ item }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    {% if result.score_details %}
+    <div class="analysis-block mt-3">
+      <div class="score-header">
+        <div class="score-header-title">🧮 Detail Perhitungan Score</div>
+        <div class="score-mini">AUTO SCORING ENGINE</div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="slik-table">
+          <thead>
+            <tr>
+              <th>Faktor</th>
+              <th>Kondisi</th>
+              <th>Dampak Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in result.score_details %}
+            <tr>
+              <td>{{ s.faktor }}</td>
+              <td>{{ s.kondisi }}</td>
+              <td><span class="score-badge">{{ s.dampak }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="
+      final-decision
+      {% if result.risk == 'TINGGI' %}
+        high
+      {% elif result.risk == 'SEDANG' %}
+        medium
+      {% else %}
+        low
+      {% endif %}
+    ">
+      <div class="final-label">Keputusan Awal Sistem</div>
+
+      <div class="final-result">
+        {{ result.decision_label or result.recommendation }}
+      </div>
+
+      <div class="final-desc">
+        Hasil ini merupakan rekomendasi otomatis berdasarkan histori SLIK,
+        kolektibilitas, jumlah fasilitas, dan parameter scoring internal.
+      </div>
+    </div>
+  </div>
+
+  <div class="cardx mb-4">
+    <div class="section-title">📋 Detail Fasilitas Kredit</div>
+
+    <div class="table-wrap">
+      <table class="slik-table">
+        <thead>
+          <tr>
+            <th>Kreditur</th>
+            <th>Kategori</th>
+            <th>Jenis</th>
+            <th>Plafon</th>
+            <th>Baki Debet</th>
+            <th>Kol</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if extracted.kredit and extracted.kredit|length > 0 %}
+            {% for k in extracted.kredit %}
+            <tr>
+              <td>
+                <strong>{{ k.kreditur or '-' }}</strong>
+
+                {% if k.is_pinjol %}
+                  <div class="status-pinjol">Digital / Fintech</div>
+                {% endif %}
+
+                {% if k.tanggal_update %}
+                  <div class="small-muted">Update: {{ k.tanggal_update }}</div>
+                {% endif %}
+              </td>
+
+              <td>{{ k.kategori or '-' }}</td>
+              <td>{{ k.jenis or '-' }}</td>
+              <td>Rp {{ k.plafon_fmt or k.plafon }}</td>
+              <td>Rp {{ k.baki_debet_fmt or k.baki_debet }}</td>
+
+              <td>
+                <span class="badge-kol kol-{{ k.kol }}">{{ k.kol }}</span>
+              </td>
+
+              <td>
+                {% if k.status_label == "LUNAS" %}
+                  <span class="status-lunas">LUNAS ✓</span>
+                {% elif k.status_label == "DIALIHKAN" %}
+                  <span class="status-dialihkan">DIALIHKAN</span>
+                {% else %}
+                  {{ k.status or '-' }}
+                {% endif %}
+
+                {% if k.is_baru_3_bulan %}
+                  <div class="status-baru">Baru ≤ 3 bulan</div>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                Tidak ada data fasilitas kredit yang dapat ditampilkan.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="4">Total Baki Debet</td>
+            <td>Rp {{ extracted.total_baki_debet_fmt }}</td>
+            <td colspan="2">Ringkasan otomatis sistem</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const kolData = {
+  k1: {{ extracted.kredit | selectattr("kol", "equalto", 1) | list | length if extracted.kredit else 0 }},
+  k2: {{ extracted.kredit | selectattr("kol", "equalto", 2) | list | length if extracted.kredit else 0 }},
+  k3plus: {{ extracted.kredit | rejectattr("kol", "equalto", 1) | rejectattr("kol", "equalto", 2) | list | length if extracted.kredit else 0 }}
+};
+
+const ctx = document.getElementById('riskPie');
+
+if (ctx) {
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Kol 1 Saat Ini', 'Kol 2 Saat Ini', 'Kol 3+ Saat Ini'],
+      datasets: [{
+        data: [kolData.k1, kolData.k2, kolData.k3plus],
+        backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 12,
+            font: { size: 12 }
+          }
+        }
+      }
+    }
+  });
+}
+</script>
+
+</body>
+</html>
