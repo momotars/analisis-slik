@@ -499,7 +499,7 @@ body {
   </div>
 
   <div class="d-flex gap-2">
-    <a href="/export-pdf" class="btn btn-light btn-soft">📄 Export PDF</a>
+    <a href="/export-pdf/{{ history_id }}" class="btn btn-light btn-soft">📄 Export PDF</a>
     <a href="/" class="btn btn-outline-light btn-soft">Upload</a>
     <a href="/history" class="btn btn-outline-light btn-soft">History</a>
     <a href="/logout" class="btn btn-outline-danger btn-soft">Logout</a>
@@ -758,6 +758,41 @@ body {
       </div>
     </div>
   </div>
+
+  {% if ai_text %}
+  <div class="cardx mb-4" style="background: linear-gradient(135deg, #ffffff, #f8fafc); border-left: 6px solid #4c1d95;">
+    <div class="section-title">🤖 Analisis Asisten AI</div>
+    <div class="row">
+      <div class="col-12">
+        <div class="ai-narrative-box" style="line-height: 1.7; font-size: 14.5px; color: #1e293b;">
+          {% for paragraph in ai_text.split('\n\n') %}
+            {% if paragraph.strip() %}
+              {% set lines = paragraph.split('\n') %}
+              {% set title = lines[0].strip() %}
+              {% if title in ["RINGKASAN PROFIL", "ANALISIS RISIKO", "CATATAN PENTING", "REKOMENDASI / KLARIFIKASI"] %}
+                <h6 style="color: #4c1d95; font-weight: 800; margin-top: 20px; margin-bottom: 10px; font-size: 14px; letter-spacing: 0.05em;">
+                  {{ title }}
+                </h6>
+                <ul style="list-style-type: none; padding-left: 0; margin-bottom: 0;">
+                  {% for line in lines[1:] %}
+                    {% if line.strip() %}
+                      <li style="position: relative; padding-left: 20px; margin-bottom: 8px;">
+                        <span style="position: absolute; left: 0; color: #4c1d95;">•</span>
+                        {{ line.lstrip('-• ').strip() }}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p style="margin-bottom: 15px;">{{ paragraph.strip() }}</p>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   <div class="cardx mb-4">
     <div class="section-title">📋 Detail Fasilitas Kredit</div>

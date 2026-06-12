@@ -2,78 +2,317 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <title>History Analisis</title>
+  <title>Riwayat Analisis SLIK OJK</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(83, 35, 151, .08), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255, 153, 0, .10), transparent 35%),
+        #eef2f7;
+      color: #111827;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #111827, #1f2a44);
+      color: white;
+      padding: 22px 32px;
+      border-bottom: 5px solid #c8962e;
+      box-shadow: 0 8px 24px rgba(15,23,42,.25);
+    }
+
+    .topbar h3 {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .topbar small {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .container-main {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    .cardx {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 22px;
+      box-shadow: 0 10px 28px rgba(15,23,42,.06);
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 850;
+      margin-bottom: 24px;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .slik-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 0;
+    }
+
+    .slik-table thead {
+      background: #111827;
+      color: white;
+    }
+
+    .slik-table th {
+      padding: 14px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      border: none;
+    }
+
+    .slik-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .slik-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .btn-soft {
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 6px 12px;
+    }
+
+    .badge-risk {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .risk-TINGGI {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .risk-SEDANG {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .risk-RENDAH {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+      background: #111827;
+      color: white;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-bottom: 3px solid #c8962e;
+    }
+
+    .modal-title {
+      font-weight: 800;
+    }
+
+    .btn-close-white {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    .btn-action-view {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-action-view:hover {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .btn-action-pdf {
+      background-color: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-action-pdf:hover {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+  </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container py-4">
-
-  <div class="d-flex justify-content-between mb-3">
-    <h4>📊 History Analisis</h4>
-    <div>
-      <a href="/" class="btn btn-outline-secondary">Kembali</a>
-      <a href="/logout" class="btn btn-outline-danger">Logout</a>
-    </div>
+<div class="topbar d-flex justify-content-between align-items-center">
+  <div>
+    <h3>📋 Riwayat Analisis SLIK OJK</h3>
+    <small>Log aktivitas audit, verifikasi debitur, dan laporan keputusan sistem</small>
   </div>
 
-  <div class="card shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-striped mb-0">
-        <thead class="table-light">
+  <div class="d-flex gap-2">
+    <a href="/" class="btn btn-outline-light btn-soft">Upload Baru</a>
+    <a href="/logout" class="btn btn-outline-danger btn-soft">Logout</a>
+  </div>
+</div>
+
+<div class="container-main">
+  <div class="cardx">
+    <div class="section-title">📊 Daftar Riwayat Audit Debitur</div>
+
+    <div class="table-wrap">
+      <table class="slik-table">
+        <thead>
           <tr>
-            <th>Tanggal</th>
-            <th>Nama</th>
+            <th>Tanggal Upload</th>
+            <th>Nama Debitur</th>
             <th>NIK</th>
-            <th>Kolektibilitas</th>
-            <th>Plafon</th>
-            <th>Tunggakan</th>
-            <th>Risiko</th>
+            <th>Kol Terburuk</th>
+            <th>Total Plafon</th>
+            <th>Total Tunggakan</th>
+            <th>Tingkat Risiko</th>
+            <th>Aksi</th>
           </tr>
         </thead>
 
         <tbody>
-          {% for row in data %}
-          <tr>
-            <td>{{ row.created_at }}</td>
-            <td>{{ row.nama }}</td>
-            <td>{{ row.nik }}</td>
-            <td>{{ row.kolektibilitas }}</td>
-
-            <td>
-              Rp {{ "{:,}".format(row.total_plafon).replace(",", ".") }}
-            </td>
-
-            <td>
-              {% if row.total_tunggakan > 0 %}
-                <span class="text-danger fw-bold">
-                  Rp {{ "{:,}".format(row.total_tunggakan).replace(",", ".") }}
+          {% if data and data|length > 0 %}
+            {% for row in data %}
+            <tr>
+              <td><span class="text-muted" style="font-size: 12px;">{{ row.created_at }}</span></td>
+              <td><strong>{{ row.nama or '-' }}</strong></td>
+              <td><code style="color: #475569; font-size: 12.5px;">{{ row.nik or '-' }}</code></td>
+              <td class="text-center">
+                <span class="badge rounded-pill {% if row.kolektibilitas|int == 1 %}bg-success{% elif row.kolektibilitas|int == 2 %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size: 11px;">
+                  Kol {{ row.kolektibilitas or '0' }}
                 </span>
-              {% else %}
-                Rp 0
-              {% endif %}
-            </td>
+              </td>
+              <td>Rp {{ "{:,}".format(row.total_plafon).replace(",", ".") }}</td>
+              <td>
+                {% if row.total_tunggakan > 0 %}
+                  <span class="text-danger fw-bold">
+                    Rp {{ "{:,}".format(row.total_tunggakan).replace(",", ".") }}
+                  </span>
+                {% else %}
+                  <span class="text-success">Rp 0</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-risk risk-{{ row.risiko }}">
+                  {{ row.risiko }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-soft btn-action-view d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#modal-{{ row.id }}">
+                    🤖 AI Note
+                  </button>
+                  <a href="/export-pdf/{{ row.id }}" class="btn btn-soft btn-action-pdf d-flex align-items-center gap-1">
+                    📄 PDF
+                  </a>
+                </div>
+              </td>
+            </tr>
 
-            <td>
-              {% if row.risiko == "TINGGI" %}
-                <span class="text-danger fw-bold">{{ row.risiko }}</span>
-              {% elif row.risiko == "SEDANG" %}
-                <span class="text-warning fw-bold">{{ row.risiko }}</span>
-              {% else %}
-                <span class="text-success fw-bold">{{ row.risiko }}</span>
-              {% endif %}
-            </td>
+            <!-- Modal Detail AI -->
+            <div class="modal fade" id="modal-{{ row.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ row.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ row.id }}">🤖 Catatan Narasi AI - {{ row.nama or 'Debitur' }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body p-4" style="background: #f8fafc;">
+                    {% if row.ai_text %}
+                      <div class="ai-box" style="line-height: 1.7; font-size: 14.5px; color: #1e293b;">
+                        {% for paragraph in row.ai_text.split('\n\n') %}
+                          {% if paragraph.strip() %}
+                            {% set lines = paragraph.split('\n') %}
+                            {% set title = lines[0].strip() %}
+                            {% if title in ["RINGKASAN PROFIL", "ANALISIS RISIKO", "CATATAN PENTING", "REKOMENDASI / KLARIFIKASI"] %}
+                              <h6 style="color: #4c1d95; font-weight: 800; margin-top: 18px; margin-bottom: 8px; font-size: 13.5px; letter-spacing: 0.05em;">
+                                {{ title }}
+                              </h6>
+                              <ul style="list-style-type: none; padding-left: 0; margin-bottom: 0;">
+                                {% for line in lines[1:] %}
+                                  {% if line.strip() %}
+                                    <li style="position: relative; padding-left: 20px; margin-bottom: 6px;">
+                                      <span style="position: absolute; left: 0; color: #4c1d95;">•</span>
+                                      {{ line.lstrip('-• ').strip() }}
+                                    </li>
+                                  {% endif %}
+                                {% endfor %}
+                              </ul>
+                            {% else %}
+                              <p style="margin-bottom: 12px; white-space: pre-wrap;">{{ paragraph.strip() }}</p>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <div class="text-center py-4 text-muted">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+                        Catatan analisis AI tidak tersedia untuk rekaman ini.
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="modal-footer" style="background: #f1f5f9; border-top: 1px solid #e2e8f0; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 700; font-size: 13px;">Tutup</button>
+                    <a href="/export-pdf/{{ row.id }}" class="btn btn-primary" style="border-radius: 10px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #4c1d95, #6d28d9); border: none;">
+                      Unduh PDF Laporan
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          </tr>
-          {% endfor %}
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-5">
+                <div style="font-size: 40px; margin-bottom: 10px;">📂</div>
+                Belum ada riwayat hasil analisis SLIK yang tersimpan.
+              </td>
+            </tr>
+          {% endif %}
         </tbody>
-
       </table>
     </div>
   </div>
-
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -291,7 +291,9 @@ def generate_ai_analysis(data):
         result = generate_with_openai(prompt)
         return clean_ai_text(result)
     except Exception as e:
-        print("OpenAI gagal → pakai Ollama:", e)
+        print("OpenAI gagal -> pakai Ollama:", e)
+
+
 
     # 2. Fallback ke Ollama lokal
     try:

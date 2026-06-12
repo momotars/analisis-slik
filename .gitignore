@@ -6,3 +6,5 @@ uploads/
 instance/
 history.db
 *.sqlite3
+database.db
+*.db

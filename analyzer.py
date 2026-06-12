@@ -472,6 +472,23 @@ def analyze_slik(data):
         )
 
     # =========================
+    # RULE CAPPING UNTUK DEBITUR LANCAR (KOL 1 & TANPA TUNGGAKAN)
+    # =========================
+    is_lancar_bersih = (kolek <= 1) and (tunggakan == 0) and (kol3plus_aktif == 0) and (kol2_aktif == 0)
+
+    if is_lancar_bersih:
+        # Debitur 100% lancar dan tanpa tunggakan dibatasi skor maksimalnya di 34 (Kategori RENDAH)
+        # Hal ini memberikan pembeda (score lebih besar dari 0 jika debitur memiliki banyak fasilitas/paylater),
+        # namun menjamin debitur tidak jatuh ke kategori risiko SEDANG/TINGGI yang dapat mempersulit persetujuan.
+        if score > 34:
+            score_details.append({
+                "faktor": "Capping Debitur Lancar",
+                "kondisi": "Kol 1 & Tanpa Tunggakan",
+                "dampak": f"Skor disesuaikan dari {score} menjadi 34"
+            })
+            score = 34
+
+    # =========================
     # SCORE FINAL
     # =========================
 
@@ -486,6 +503,7 @@ def analyze_slik(data):
     else:
         risk = "RENDAH"
         decision_label = "DAPAT DILANJUTKAN DENGAN VERIFIKASI"
+
 
     # =========================
     # RINGKASAN FAKTUAL
