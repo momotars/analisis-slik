@@ -57,19 +57,50 @@ def build_prompt(data):
 
     is_joint = data.get("is_joint", False)
 
-    role_desc = "Kamu adalah analis kredit internal bank di Indonesia.\n\nTugas kamu membuat CATATAN TAMBAHAN untuk membantu analis membaca data SLIK.\nCatatan ini bukan keputusan kredit final."
+    role_desc = "Kamu adalah analis kredit internal bank di Indonesia.\n\nTugas kamu membuat Ringkasan dan Analisis Risiko SLIK untuk membantu analis kredit.\nCatatan ini bukan keputusan kredit final."
     profile_data = f"Nama Debitur: {data.get('nama', '-')}\nNIK: {data.get('nik', '-')}"
 
     if is_joint:
         role_desc = (
             "Kamu adalah analis kredit internal bank di Indonesia.\n\n"
-            "Tugas kamu membuat CATATAN TAMBAHAN GABUNGAN untuk membantu analis membaca data SLIK gabungan Suami & Istri (Joint Analysis).\n"
+            "Tugas kamu membuat Ringkasan dan Analisis Risiko SLIK gabungan Suami & Istri (Joint Analysis) untuk membantu analis kredit.\n"
             "Evaluasi total eksposur utang rumah tangga, baki debet gabungan, dan kapasitas finansial kedua belah pihak secara holistik.\n"
             "Catatan ini bukan keputusan kredit final."
         )
         profile_data = (
             f"Nama Debitur Utama: {data.get('nama', '-')}\nNIK: {data.get('nik', '-')}\n"
             f"Nama Pasangan: {data.get('nama_spouse', '-')}\nNIK Pasangan: {data.get('nik_spouse', '-')}"
+        )
+
+    # Aturan Kolektibilitas Dinamis berdasarkan data riil
+    try:
+        kolek_val = int(data.get("kolektibilitas_terburuk", 0))
+    except Exception:
+        kolek_val = 0
+
+    if kolek_val == 1:
+        kol_rules = (
+            "- Debitur memiliki status Kolektibilitas Terburuk Kol 1 (Lancar).\n"
+            "- Wajib menyatakan bahwa riwayat kolektibilitas lancar, bersih, dan tidak memiliki tunggakan sama sekali.\n"
+            "- JANGAN PERNAH menulis kalimat seperti 'riwayat kolektibilitas tinggi' atau 'risiko kolektibilitas tinggi' atau 'perhatian khusus' untuk debitur ini.\n"
+            "- Sebutkan bahwa risiko kolektibilitas rendah."
+        )
+    elif kolek_val == 2:
+        kol_rules = (
+            "- Debitur memiliki status Kolektibilitas Terburuk Kol 2 (Dalam Perhatian Khusus).\n"
+            "- Wajib menyebutkan bahwa terdapat riwayat kolektibilitas dalam perhatian khusus (DPK).\n"
+            "- JANGAN menyatakan bahwa debitur sepenuhnya lancar/bersih."
+        )
+    elif kolek_val in [3, 4, 5]:
+        kol_rules = (
+            f"- Debitur memiliki status Kolektibilitas Terburuk Kol {kolek_val} ({status_kol}).\n"
+            f"- Wajib menyebutkan bahwa debitur memiliki riwayat kolektibilitas kurang baik / buruk ({status_kol}) atau risiko kolektibilitas tinggi.\n"
+            "- Jangan menyatakan debitur lancar atau bersih."
+        )
+    else:
+        kol_rules = (
+            "- Wajib mengikuti status kolektibilitas menurut sistem.\n"
+            "- Jangan menafsirkan ulang angka kolektibilitas."
         )
 
     return f"""
@@ -119,14 +150,15 @@ PANDUAN KOLEKTIBILITAS:
 - Kol 5 = Macet
 
 ATURAN KOLEKTIBILITAS:
+{kol_rules}
 - Wajib mengikuti status kolektibilitas menurut sistem.
 - Jangan menafsirkan ulang angka kolektibilitas.
 - Jangan menyebut Kol 3, Kol 4, atau Kol 5 sebagai baik/lancar.
 - Jangan menyebut debitur sehat jika terdapat Kol 3, Kol 4, atau Kol 5.
 - Jangan menggunakan kalimat "kolektibilitas masih tinggi".
-- Gunakan kalimat "riwayat kolektibilitas tinggi" atau "risiko kolektibilitas tinggi".
 
 FORMAT OUTPUT WAJIB:
+Wajib menghasilkan output dalam format 4 bagian ini secara persis. JANGAN menuliskan pengantar (seperti CATATAN TAMBAHAN) sebelum RINGKASAN PROFIL:
 
 RINGKASAN PROFIL
 - ...
@@ -253,6 +285,8 @@ def clean_ai_text(text):
         "FORMAT OUTPUT WAJIB",
         "Tugas kamu",
         "Kamu adalah",
+        "CATATAN TAMBAHAN",
+        "CATATAN TAMBAHAN GABUNGAN",
     ]
 
     allowed_headings = [
