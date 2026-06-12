@@ -5,12 +5,12 @@ import json
 from functools import wraps
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from parser_slik import parse_slik_file
 from analyzer import analyze_slik
 from ai_helper import generate_ai_analysis
-from database import init_db, save_history, get_history, get_history_by_id
+from database import init_db, save_history, get_history, get_history_by_id, create_user, get_user_by_username, get_users_count
 
 
 from reportlab.lib.pagesizes import A4
@@ -35,6 +35,16 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 init_db()
+
+
+def seed_users():
+    if get_users_count() == 0:
+        users = load_users()
+        for username, uinfo in users.items():
+            hashed = generate_password_hash(uinfo["password"])
+            create_user(username, hashed, uinfo["role"])
+
+
 
 
 
@@ -63,6 +73,9 @@ def load_users():
         }
 
     return users
+
+
+seed_users()
 
 
 def allowed_file(filename):
@@ -94,6 +107,45 @@ def admin_required(f):
 # =========================
 # AUTH
 # =========================
+# =========================
+# AUTH & REGISTRATION
+# =========================
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if session.get("logged_in"):
+        return redirect("/")
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
+
+        if not username or not password:
+            flash("Username dan password wajib diisi.")
+            return redirect("/register")
+
+        if password != confirm_password:
+            flash("Konfirmasi password tidak cocok.")
+            return redirect("/register")
+
+        # Periksa apakah user sudah terdaftar
+        existing_user = get_user_by_username(username)
+        if existing_user:
+            flash("Username sudah terdaftar.")
+            return redirect("/register")
+
+        # Hash dan simpan
+        hashed = generate_password_hash(password)
+        # Registrasi selalu menghasilkan role user (petugas)
+        role = "user"
+        
+        create_user(username, hashed, role)
+        flash("Registrasi berhasil! Silakan login.")
+        return redirect("/login")
+
+    return render_template("register.html")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("logged_in"):
@@ -103,17 +155,13 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
-        users = load_users()
-        user = users.get(username)
+        user = get_user_by_username(username)
 
-        if user:
-            # Dukung password terenkripsi (check_password_hash) atau plaintext
-            is_valid = (password == user["password"]) or check_password_hash(user["password"], password)
-            if is_valid:
-                session["logged_in"] = True
-                session["username"] = username
-                session["role"] = user["role"]
-                return redirect("/")
+        if user and check_password_hash(user["password"], password):
+            session["logged_in"] = True
+            session["username"] = username
+            session["role"] = user["role"]
+            return redirect("/")
 
         flash("Username atau password salah.")
         return redirect("/login")

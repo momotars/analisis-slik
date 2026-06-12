@@ -197,6 +197,7 @@
         <thead>
           <tr>
             <th>Tanggal Upload</th>
+            <th>Petugas</th>
             <th>Nama Debitur</th>
             <th>NIK</th>
             <th>Kol Terburuk</th>
@@ -212,6 +213,7 @@
             {% for row in data %}
             <tr>
               <td><span class="text-muted" style="font-size: 12px;">{{ row.created_at }}</span></td>
+              <td><span class="badge bg-secondary rounded-pill px-2 py-1" style="font-size: 11px; background-color: #475569 !important;">{{ row.username or 'unknown' }}</span></td>
               <td><strong>{{ row.nama or '-' }}</strong></td>
               <td><code style="color: #475569; font-size: 12.5px;">{{ row.nik or '-' }}</code></td>
               <td class="text-center">
@@ -301,7 +303,7 @@
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="8" class="text-center text-muted py-5">
+              <td colspan="9" class="text-center text-muted py-5">
                 <div style="font-size: 40px; margin-bottom: 10px;">📂</div>
                 Belum ada riwayat hasil analisis SLIK yang tersimpan.
               </td>

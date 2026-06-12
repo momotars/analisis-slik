@@ -35,6 +35,15 @@ def init_db():
                     result_json TEXT
                 )
             """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE,
+                    password TEXT,
+                    role TEXT
+                )
+            """)
             
             # Migrasi database jika kolom belum ada
             try:
@@ -108,6 +117,41 @@ def get_history():
         """)
         rows = cursor.fetchall()
         return rows
+    finally:
+        conn.close()
+
+
+def create_user(username, hashed_password, role="user"):
+    conn = get_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR IGNORE INTO users (username, password, role)
+                VALUES (?, ?, ?)
+            """, (username, hashed_password, role))
+            return cursor.lastrowid
+    finally:
+        conn.close()
+
+
+def get_user_by_username(username):
+    conn = get_connection()
+    try:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        return cursor.fetchone()
+    finally:
+        conn.close()
+
+
+def get_users_count():
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM users")
+        return cursor.fetchone()[0]
     finally:
         conn.close()
 
