@@ -509,18 +509,46 @@ body {
 <div class="container-main">
 
   <div class="cardx mb-4">
-    <div class="section-title">👤 Data Debitur</div>
+    <div class="section-title">👤 Data Debitur {% if extracted.is_joint %}(Gabungan Suami-Istri){% endif %}</div>
 
     <div class="row g-3">
-      <div class="col-md-6">
-        <div class="label">Nama</div>
-        <div class="value">{{ extracted.nama or '-' }}</div>
-      </div>
+      {% if extracted.is_joint %}
+        <div class="col-md-6" style="border-right: 1px solid var(--border); padding-right: 20px;">
+          <h6 class="fw-bold" style="color: #4c1d95; margin-bottom: 12px;">👤 Debitur Utama</h6>
+          <div class="mb-3">
+            <div class="label">Nama</div>
+            <div class="value">{{ extracted.nama_primary or '-' }}</div>
+          </div>
+          <div>
+            <div class="label">NIK</div>
+            <div class="value">{{ extracted.nik_primary or '-' }}</div>
+          </div>
+        </div>
 
-      <div class="col-md-6">
-        <div class="label">NIK</div>
-        <div class="value">{{ extracted.nik or '-' }}</div>
-      </div>
+        <div class="col-md-6" style="padding-left: 20px;">
+          <h6 class="fw-bold" style="color: #7c3aed; margin-bottom: 12px;">👤 Pasangan (Suami/Istri)</h6>
+          <div class="mb-3">
+            <div class="label">Nama</div>
+            <div class="value">{{ extracted.nama_spouse or '-' }}</div>
+          </div>
+          <div>
+            <div class="label">NIK</div>
+            <div class="value">{{ extracted.nik_spouse or '-' }}</div>
+          </div>
+        </div>
+
+        <div class="col-12"><hr style="border-top: 1px solid var(--border); margin: 10px 0 15px 0;"></div>
+      {% else %}
+        <div class="col-md-6">
+          <div class="label">Nama</div>
+          <div class="value">{{ extracted.nama or '-' }}</div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="label">NIK</div>
+          <div class="value">{{ extracted.nik or '-' }}</div>
+        </div>
+      {% endif %}
 
       <div class="col-md-4">
         <div class="label">Posisi Data</div>
@@ -802,6 +830,9 @@ body {
         <thead>
           <tr>
             <th>Kreditur</th>
+            {% if extracted.is_joint %}
+              <th>Debitur</th>
+            {% endif %}
             <th>Kategori</th>
             <th>Jenis</th>
             <th>Plafon</th>
@@ -826,6 +857,16 @@ body {
                   <div class="small-muted">Update: {{ k.tanggal_update }}</div>
                 {% endif %}
               </td>
+
+              {% if extracted.is_joint %}
+                <td>
+                  {% if k.debitur_role == "Debitur Utama" %}
+                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 10px; background-color: #1e3a8a !important;">Utama</span>
+                  {% else %}
+                    <span class="badge bg-purple rounded-pill px-2 py-1" style="font-size: 10px; background-color: #7c3aed !important;">Pasangan</span>
+                  {% endif %}
+                </td>
+              {% endif %}
 
               <td>{{ k.kategori or '-' }}</td>
               <td>{{ k.jenis or '-' }}</td>
@@ -853,7 +894,7 @@ body {
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="7" class="text-center text-muted py-4">
+              <td colspan="{% if extracted.is_joint %}8{% else %}7{% endif %}" class="text-center text-muted py-4">
                 Tidak ada data fasilitas kredit yang dapat ditampilkan.
               </td>
             </tr>
@@ -862,7 +903,7 @@ body {
 
         <tfoot>
           <tr>
-            <td colspan="4">Total Baki Debet</td>
+            <td colspan="{% if extracted.is_joint %}5{% else %}4{% endif %}">Total Baki Debet</td>
             <td>Rp {{ extracted.total_baki_debet_fmt }}</td>
             <td colspan="2">Ringkasan otomatis sistem</td>
           </tr>

@@ -190,6 +190,24 @@ body {
   color: #94a3b8;
   font-size: 13px;
 }
+
+/* Segment Control Custom Styles */
+.btn-group .btn-check:checked + .btn-outline-primary {
+  background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(76,29,149,0.2);
+}
+
+.btn-group .btn-outline-primary {
+  color: #475569;
+  border-radius: 10px !important;
+  transition: all 0.2s ease;
+}
+
+.btn-group .btn-outline-primary:hover {
+  color: #4c1d95;
+  background: rgba(76,29,149,0.05);
+}
 </style>
 </head>
 
@@ -226,14 +244,32 @@ body {
         {% endif %}
       {% endwith %}
 
+      <!-- Tab Switcher -->
+      <div class="d-flex justify-content-center mb-4">
+        <div class="btn-group w-100" role="group" style="background: rgba(226, 232, 240, 0.5); border-radius: 14px; padding: 4px;">
+          <input type="radio" class="btn-check" name="analysis_type" id="type_single" value="single" checked autocomplete="off">
+          <label class="btn btn-outline-primary border-0 rounded-pill py-2 fw-bold text-center" for="type_single" style="font-size: 13px; border-radius: 10px !important; flex: 1;">👤 Analisis Tunggal</label>
+
+          <input type="radio" class="btn-check" name="analysis_type" id="type_joint" value="joint" autocomplete="off">
+          <label class="btn btn-outline-primary border-0 rounded-pill py-2 fw-bold text-center" for="type_joint" style="font-size: 13px; border-radius: 10px !important; flex: 1;">👥 Analisis Gabungan</label>
+        </div>
+      </div>
+
       <form method="POST" enctype="multipart/form-data">
-        <div class="mb-4">
-          <label class="form-label">File SLIK</label>
+        <input type="hidden" name="mode" id="form_mode" value="single">
+
+        <div class="mb-3">
+          <label class="form-label" id="label_file_primary">File SLIK Debitur</label>
           <input class="form-control" type="file" name="file" accept=".pdf,.xlsx,.xls" required>
         </div>
 
-        <button type="submit" class="btn btn-analisis">
-          🔍 Analisis
+        <div class="mb-4" id="spouse_file_container" style="display: none;">
+          <label class="form-label">File SLIK Pasangan (Suami/Istri)</label>
+          <input class="form-control" type="file" name="file_spouse" id="file_spouse" accept=".pdf,.xlsx,.xls">
+        </div>
+
+        <button type="submit" class="btn btn-analisis w-100">
+          🔍 Mulai Analisis
         </button>
       </form>
 
@@ -250,6 +286,32 @@ body {
 </div>
 
 <script>
+const typeSingle = document.getElementById('type_single');
+const typeJoint = document.getElementById('type_joint');
+const spouseContainer = document.getElementById('spouse_file_container');
+const fileSpouseInput = document.getElementById('file_spouse');
+const labelPrimary = document.getElementById('label_file_primary');
+const formMode = document.getElementById('form_mode');
+
+typeSingle.addEventListener('change', function() {
+  if (this.checked) {
+    spouseContainer.style.display = 'none';
+    fileSpouseInput.required = false;
+    fileSpouseInput.value = '';
+    labelPrimary.textContent = 'File SLIK Debitur';
+    formMode.value = 'single';
+  }
+});
+
+typeJoint.addEventListener('change', function() {
+  if (this.checked) {
+    spouseContainer.style.display = 'block';
+    fileSpouseInput.required = true;
+    labelPrimary.textContent = 'File SLIK Debitur Utama';
+    formMode.value = 'joint';
+  }
+});
+
 document.querySelector('form').addEventListener('submit', function() {
   document.getElementById('loadingOverlay').style.display = 'flex';
 });

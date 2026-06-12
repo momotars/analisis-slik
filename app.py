@@ -129,12 +129,108 @@ def logout():
 
 
 # =========================
-# MAIN PAGE
+# MAIN PAGE & JOINT HELPER
 # =========================
+def merge_slik_data(primary, spouse):
+    for k in primary.get("kredit", []):
+        k["debitur_role"] = "Debitur Utama"
+    for k in spouse.get("kredit", []):
+        k["debitur_role"] = "Pasangan"
+
+    combined_kredit = primary.get("kredit", []) + spouse.get("kredit", [])
+
+    total_plafon = primary.get("total_plafon", 0) + spouse.get("total_plafon", 0)
+    total_baki_debet = primary.get("total_baki_debet", 0) + spouse.get("total_baki_debet", 0)
+    total_baki_debet_aktif = primary.get("total_baki_debet_aktif", 0) + spouse.get("total_baki_debet_aktif", 0)
+    total_tunggakan = primary.get("total_tunggakan", 0) + spouse.get("total_tunggakan", 0)
+
+    kol_primary = primary.get("kolektibilitas_terburuk", 0) or 0
+    kol_spouse = spouse.get("kolektibilitas_terburuk", 0) or 0
+    kolektibilitas_terburuk = max(kol_primary, kol_spouse)
+
+    bank_umum = primary.get("bank_umum", 0) + spouse.get("bank_umum", 0)
+    bpr_bprs = primary.get("bpr_bprs", 0) + spouse.get("bpr_bprs", 0)
+    lembaga_pembiayaan = primary.get("lembaga_pembiayaan", 0) + spouse.get("lembaga_pembiayaan", 0)
+    lainnya = primary.get("lainnya", 0) + spouse.get("lainnya", 0)
+    jumlah_kreditur = bank_umum + bpr_bprs + lembaga_pembiayaan + lainnya
+
+    jumlah_lunas = primary.get("jumlah_lunas", 0) + spouse.get("jumlah_lunas", 0)
+    jumlah_aktif = primary.get("jumlah_aktif", 0) + spouse.get("jumlah_aktif", 0)
+    jumlah_fasilitas = primary.get("jumlah_indikasi_fasilitas", 0) + spouse.get("jumlah_indikasi_fasilitas", 0)
+
+    jumlah_fasilitas_baru_3_bulan = primary.get("jumlah_fasilitas_baru_3_bulan", 0) + spouse.get("jumlah_fasilitas_baru_3_bulan", 0)
+    jumlah_pinjol = primary.get("jumlah_pinjol", 0) + spouse.get("jumlah_pinjol", 0)
+    jumlah_pinjol_baru_3_bulan = primary.get("jumlah_pinjol_baru_3_bulan", 0) + spouse.get("jumlah_pinjol_baru_3_bulan", 0)
+
+    pinjol_baru_3_bulan = primary.get("pinjol_baru_3_bulan", []) + spouse.get("pinjol_baru_3_bulan", [])
+    fasilitas_baru_3_bulan = primary.get("fasilitas_baru_3_bulan", []) + spouse.get("fasilitas_baru_3_bulan", [])
+
+    nama_primary = primary.get("nama", "Debitur Utama")
+    nama_spouse = spouse.get("nama", "Pasangan")
+    nik_primary = primary.get("nik", "-")
+    nik_spouse = spouse.get("nik", "-")
+
+    def format_rupiah(value):
+        try:
+            return f"{int(value or 0):,}".replace(",", ".")
+        except Exception:
+            return "0"
+
+    return {
+        "nama": f"{nama_primary} & {nama_spouse} (Gabungan)",
+        "nik": f"{nik_primary} / {nik_spouse}",
+        "nomor_laporan": f"{primary.get('nomor_laporan', '-')}",
+        "posisi_data": f"{primary.get('posisi_data', '-')}",
+        "tanggal_permintaan": f"{primary.get('tanggal_permintaan', '-')}",
+
+        "is_joint": True,
+        "nama_primary": nama_primary,
+        "nama_spouse": nama_spouse,
+        "nik_primary": nik_primary,
+        "nik_spouse": nik_spouse,
+
+        "kolektibilitas_terburuk": kolektibilitas_terburuk,
+        "bulan_kolektibilitas_terburuk": primary.get("bulan_kolektibilitas_terburuk") or spouse.get("bulan_kolektibilitas_terburuk") or "-",
+
+        "jumlah_indikasi_fasilitas": jumlah_fasilitas,
+        "jumlah_kreditur": jumlah_kreditur,
+        "bank_umum": bank_umum,
+        "bpr_bprs": bpr_bprs,
+        "lembaga_pembiayaan": lembaga_pembiayaan,
+        "lainnya": lainnya,
+
+        "jumlah_lunas": jumlah_lunas,
+        "jumlah_aktif": jumlah_aktif,
+        "jumlah_fasilitas_aktif": jumlah_aktif,
+
+        "total_tunggakan": total_tunggakan,
+        "total_plafon": total_plafon,
+        "total_baki_debet": total_baki_debet,
+        "total_baki_debet_aktif": total_baki_debet_aktif,
+
+        "total_plafon_fmt": format_rupiah(total_plafon),
+        "total_baki_debet_fmt": format_rupiah(total_baki_debet),
+        "total_baki_debet_aktif_fmt": format_rupiah(total_baki_debet_aktif),
+        "total_tunggakan_fmt": format_rupiah(total_tunggakan),
+
+        "jumlah_fasilitas_baru_3_bulan": jumlah_fasilitas_baru_3_bulan,
+        "jumlah_pinjol": jumlah_pinjol,
+        "jumlah_pinjol_baru_3_bulan": jumlah_pinjol_baru_3_bulan,
+        "indikasi_lonjakan_pinjol": (jumlah_pinjol_baru_3_bulan >= 2),
+        "catatan_lonjakan_pinjol": f"Terdapat {jumlah_pinjol_baru_3_bulan} fasilitas digital baru dalam 3 bulan terakhir." if jumlah_pinjol_baru_3_bulan > 0 else "Tidak terdeteksi fasilitas pinjol/fintech baru.",
+
+        "pinjol_baru_3_bulan": pinjol_baru_3_bulan,
+        "fasilitas_baru_3_bulan": fasilitas_baru_3_bulan,
+
+        "kredit": combined_kredit,
+    }
+
+
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
     if request.method == "POST":
+        mode = request.form.get("mode", "single")
 
         if "file" not in request.files:
             flash("File belum dipilih.")
@@ -146,13 +242,34 @@ def index():
             flash("File belum dipilih.")
             return redirect(request.url)
 
+        file_spouse = None
+        if mode == "joint":
+            if "file_spouse" in request.files:
+                file_spouse = request.files["file_spouse"]
+                if file_spouse.filename == "":
+                    flash("File pasangan belum dipilih.")
+                    return redirect(request.url)
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             file.save(filepath)
 
+            filepath_spouse = None
+            filename_spouse = None
+            if mode == "joint" and file_spouse and allowed_file(file_spouse.filename):
+                filename_spouse = secure_filename(file_spouse.filename)
+                filepath_spouse = os.path.join(app.config["UPLOAD_FOLDER"], filename_spouse)
+                file_spouse.save(filepath_spouse)
+
             try:
-                extracted = parse_slik_file(filepath)
+                if mode == "joint" and filepath_spouse:
+                    extracted_primary = parse_slik_file(filepath)
+                    extracted_spouse = parse_slik_file(filepath_spouse)
+                    extracted = merge_slik_data(extracted_primary, extracted_spouse)
+                else:
+                    extracted = parse_slik_file(filepath)
+
                 result = analyze_slik(extracted)
                 ai_text = generate_ai_analysis(extracted)
 
@@ -188,6 +305,7 @@ def index():
         "index.html",
         role=session.get("role")
     )
+
 
 
 

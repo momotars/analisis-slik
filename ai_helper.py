@@ -55,11 +55,25 @@ def build_prompt(data):
         data.get("kolektibilitas_terburuk")
     )
 
-    return f"""
-Kamu adalah analis kredit internal bank di Indonesia.
+    is_joint = data.get("is_joint", False)
 
-Tugas kamu membuat CATATAN TAMBAHAN untuk membantu analis membaca data SLIK.
-Catatan ini bukan keputusan kredit final.
+    role_desc = "Kamu adalah analis kredit internal bank di Indonesia.\n\nTugas kamu membuat CATATAN TAMBAHAN untuk membantu analis membaca data SLIK.\nCatatan ini bukan keputusan kredit final."
+    profile_data = f"Nama Debitur: {data.get('nama', '-')}\nNIK: {data.get('nik', '-')}"
+
+    if is_joint:
+        role_desc = (
+            "Kamu adalah analis kredit internal bank di Indonesia.\n\n"
+            "Tugas kamu membuat CATATAN TAMBAHAN GABUNGAN untuk membantu analis membaca data SLIK gabungan Suami & Istri (Joint Analysis).\n"
+            "Evaluasi total eksposur utang rumah tangga, baki debet gabungan, dan kapasitas finansial kedua belah pihak secara holistik.\n"
+            "Catatan ini bukan keputusan kredit final."
+        )
+        profile_data = (
+            f"Nama Debitur Utama: {data.get('nama', '-')}\nNIK: {data.get('nik', '-')}\n"
+            f"Nama Pasangan: {data.get('nama_spouse', '-')}\nNIK Pasangan: {data.get('nik_spouse', '-')}"
+        )
+
+    return f"""
+{role_desc}
 
 GUNAKAN:
 - Bahasa Indonesia formal
@@ -136,8 +150,7 @@ BATASAN OUTPUT:
 
 DATA SLIK:
 
-Nama Debitur: {data.get('nama', '-')}
-NIK: {data.get('nik', '-')}
+{profile_data}
 Posisi Data: {data.get('posisi_data', '-')}
 Tanggal Permintaan: {data.get('tanggal_permintaan', '-')}
 
